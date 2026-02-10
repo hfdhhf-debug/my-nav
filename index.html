@@ -1,87 +1,641 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人导航</title>
-    <style>
-        :root { --bg: #f4f4f5; --card: #fff; --text: #333; --hover: #3b82f6; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); padding: 20px; text-align: center; }
-        h1 { margin-bottom: 30px; font-weight: 300; letter-spacing: 1px;}
-        
-        /* 强制两列布局 */
-        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 800px; margin: 0 auto; }
-        
-        .card { 
-            background: var(--card); 
-            padding: 25px 15px; 
-            border-radius: 16px; 
-            text-decoration: none; 
-            color: var(--text); 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 12px; 
-            transition: transform 0.2s;
-        }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        
-        /* 图片图标样式 */
-        .icon-img { width: 32px; height: 32px; border-radius: 4px; object-fit: contain; }
-        .title { font-weight: 600; font-size: 15px; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>我的导航</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg: #0b0c10;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --border: rgba(255,255,255,.14);
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 14px;
+      --gap: 14px;
+      --accent: #7aa2ff;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb;
+        --card: rgba(0,0,0,.05);
+        --card2: rgba(0,0,0,.07);
+        --text: rgba(0,0,0,.88);
+        --muted: rgba(0,0,0,.55);
+        --border: rgba(0,0,0,.10);
+        --shadow: 0 10px 22px rgba(0,0,0,.10);
+        --accent: #3b6cff;
+      }
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC","Microsoft YaHei", Arial;
+      background: radial-gradient(1200px 800px at 15% 10%, rgba(122,162,255,.22), transparent 60%),
+                  radial-gradient(900px 700px at 85% 15%, rgba(255,154,76,.18), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 26px 16px 40px;
+    }
+    header{
+      display:flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .title{
+      display:flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .title h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing: .2px;
+    }
+    .title p{
+      margin:0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin: 14px 0 18px;
+    }
+    .input, .btn{
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 12px;
+      outline: none;
+      box-shadow: none;
+    }
+    .input{
+      flex: 1 1 240px;
+      min-width: 180px;
+    }
+    .btn{
+      cursor:pointer;
+      transition: transform .06s ease, background .15s ease;
+      user-select:none;
+    }
+    .btn:active{ transform: scale(.98); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(122,162,255,.20), rgba(122,162,255,.08));
+      border-color: rgba(122,162,255,.35);
+    }
+    .btn.danger{
+      background: linear-gradient(135deg, rgba(255,88,88,.18), rgba(255,88,88,.08));
+      border-color: rgba(255,88,88,.35);
+    }
+    .hint{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .panel{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .form{
+      display:grid;
+      grid-template-columns: 1fr 1.4fr auto;
+      gap: 10px;
+      align-items:center;
+    }
+    @media (max-width: 720px){
+      .form{
+        grid-template-columns: 1fr;
+      }
+      .btn.full{ width: 100%; }
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--gap);
+      margin-top: 16px;
+    }
+    @media (max-width: 900px){ .grid{ grid-template-columns: repeat(5, 1fr); } }
+    @media (max-width: 780px){ .grid{ grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 560px){ .grid{ grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 380px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+
+    .tile{
+      position: relative;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: var(--radius2);
+      padding: 12px 10px 10px;
+      text-decoration:none;
+      color: var(--text);
+      box-shadow: 0 8px 16px rgba(0,0,0,.15);
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      overflow:hidden;
+    }
+    .tile:hover{
+      transform: translateY(-2px);
+      background: var(--card2);
+      border-color: rgba(122,162,255,.28);
+    }
+    .icon{
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+    .icon img{
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+    .name{
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.2;
+      margin: 0;
+      word-break: break-word;
+    }
+    .domain{
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .menu{
+      position:absolute;
+      top: 10px;
+      right: 10px;
+      opacity: 0;
+      transition: opacity .12s ease;
+      display:flex;
+      gap: 6px;
+    }
+    .tile:hover .menu{ opacity: 1; }
+    .mini{
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+    }
+    .mini svg{ width: 14px; height: 14px; fill: var(--text); opacity:.9; }
+    .empty{
+      text-align:center;
+      color: var(--muted);
+      padding: 24px 10px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      margin-top: 16px;
+    }
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.70);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 99;
+    }
+    @media (prefers-color-scheme: light){
+      .toast{ background: rgba(0,0,0,.75); }
+    }
+    .toast.show{ opacity: 1; }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>我的导航</h1>
+        <p>只要输入「名字 + 网址」，自动展示官方图标（favicon），数据保存在本地。</p>
+      </div>
+      <button class="btn" id="btnExport" title="导出为 JSON 备份">导出</button>
+    </header>
 
-    <h1>🚀 我的传送门</h1>
+    <div class="panel">
+      <div class="form">
+        <input class="input" id="siteName" placeholder="网站名字（可自定义，比如：AI、邮箱、测速）" maxlength="24" />
+        <input class="input" id="siteUrl" placeholder="网址（必须带 http:// 或 https://）例如：https://www.youtube.com" />
+        <button class="btn primary full" id="btnAdd">添加</button>
+      </div>
 
-    <div class="container">
-        <a href="https://www.google.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=www.google.com&sz=128" class="icon-img">
-            <span class="title">Google</span>
-        </a>
+      <div class="toolbar">
+        <input class="input" id="search" placeholder="搜索（按名字/域名）" />
+        <button class="btn" id="btnSortAZ" title="按名字排序">A→Z</button>
+        <button class="btn" id="btnSortZA" title="按名字倒序">Z→A</button>
+        <button class="btn danger" id="btnClear" title="清空所有（不可恢复）">清空</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none" />
+        <button class="btn" id="btnImport" title="从导出的 JSON 导入">导入</button>
+      </div>
 
-        <a href="https://github.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=github.com&sz=128" class="icon-img">
-            <span class="title">GitHub</span>
-        </a>
-
-        <a href="https://www.bilibili.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=www.bilibili.com&sz=128" class="icon-img">
-            <span class="title">Bilibili</span>
-        </a>
-
-        <a href="https://chatgpt.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=128" class="icon-img">
-            <span class="title">ChatGPT</span>
-        </a>
-
-        <a href="https://gemini.google.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=128" class="icon-img">
-            <span class="title">Gemini</span>
-        </a>
-
-        <a href="https://x.com/i/grok" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=x.com&sz=128" class="icon-img">
-            <span class="title">Grok</span>
-        </a>
-
-        <a href="https://www.youtube.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=www.youtube.com&sz=128" class="icon-img">
-            <span class="title">YouTube</span>
-        </a>
-
-        <a href="https://mail.google.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=128" class="icon-img">
-            <span class="title">Gmail</span>
-        </a>
-
-        <a href="https://www.aliyun.com" class="card" target="_blank">
-            <img src="https://www.google.com/s2/favicons?domain=www.aliyun.com&sz=128" class="icon-img">
-            <span class="title">阿里云</span>
-        </a>
+      <div class="hint">
+        图标获取规则：优先使用 <b>https://域名/favicon.ico</b>（大多数网站都支持）。<br/>
+        如果某些网站图标加载失败，通常是对方禁止跨域访问 favicon，少数站点会这样（不是你的问题）。
+      </div>
     </div>
 
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none;">还没有添加网站。上面输入名字 + 网址，点「添加」就行。</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "nav_sites_v1";
+
+    const elName = document.getElementById("siteName");
+    const elUrl = document.getElementById("siteUrl");
+    const elAdd = document.getElementById("btnAdd");
+    const elGrid = document.getElementById("grid");
+    const elEmpty = document.getElementById("empty");
+    const elSearch = document.getElementById("search");
+    const elToast = document.getElementById("toast");
+
+    const elSortAZ = document.getElementById("btnSortAZ");
+    const elSortZA = document.getElementById("btnSortZA");
+    const elClear = document.getElementById("btnClear");
+    const elExport = document.getElementById("btnExport");
+    const elImportBtn = document.getElementById("btnImport");
+    const elImportFile = document.getElementById("importFile");
+
+    function toast(msg){
+      elToast.textContent = msg;
+      elToast.classList.add("show");
+      setTimeout(() => elToast.classList.remove("show"), 1800);
+    }
+
+    function normalizeUrl(input){
+      const s = (input || "").trim();
+      // 必须明确 http/https，避免用户输入 "youtube.com" 变成相对路径
+      if (!/^https?:\/\//i.test(s)) return null;
+      try{
+        const u = new URL(s);
+        // 只允许 http/https
+        if (!["http:", "https:"].includes(u.protocol)) return null;
+        return u.toString();
+      }catch{
+        return null;
+      }
+    }
+
+    function getDomain(url){
+      try{
+        const u = new URL(url);
+        return u.hostname.replace(/^www\./i, "");
+      }catch{
+        return "";
+      }
+    }
+
+    function faviconUrl(url){
+      // Edge 类似的“站点官方图标”，最通用方案就是 favicon.ico
+      // 注意：少数网站会限制跨域获取 favicon，这时会回退到字母占位
+      const domain = getDomain(url);
+      return `https://${domain}/favicon.ico`;
+    }
+
+    function loadSites(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const data = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(data)) return [];
+        return data;
+      }catch{
+        return [];
+      }
+    }
+
+    function saveSites(sites){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sites));
+    }
+
+    function uid(){
+      return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    }
+
+    let sites = loadSites();
+
+    function render(){
+      const q = (elSearch.value || "").trim().toLowerCase();
+      const list = q
+        ? sites.filter(s => (s.name + " " + s.domain).toLowerCase().includes(q))
+        : sites;
+
+      elGrid.innerHTML = "";
+      elEmpty.style.display = (list.length === 0) ? "block" : "none";
+
+      list.forEach(item => {
+        const a = document.createElement("a");
+        a.className = "tile";
+        a.href = item.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+
+        const menu = document.createElement("div");
+        menu.className = "menu";
+
+        const btnEdit = document.createElement("button");
+        btnEdit.className = "mini";
+        btnEdit.type = "button";
+        btnEdit.title = "编辑";
+        btnEdit.innerHTML = `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.83H5v-.92l9.06-9.06.92.92L5.92 20.08zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>`;
+
+        const btnDel = document.createElement("button");
+        btnDel.className = "mini";
+        btnDel.type = "button";
+        btnDel.title = "删除";
+        btnDel.innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 7h12v2H6V7zm2 3h8l-1 11H9L8 10zm3-6h2l1 1h4v2H6V5h4l1-1z"/></svg>`;
+
+        // 阻止点击按钮时触发跳转
+        btnEdit.addEventListener("click", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          editItem(item.id);
+        });
+        btnDel.addEventListener("click", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          delItem(item.id);
+        });
+
+        menu.appendChild(btnEdit);
+        menu.appendChild(btnDel);
+
+        const icon = document.createElement("div");
+        icon.className = "icon";
+
+        const img = document.createElement("img");
+        img.alt = item.name;
+
+        // favicon 加载失败 -> 生成首字母占位
+        img.onerror = () => {
+          icon.innerHTML = "";
+          const fallback = document.createElement("div");
+          fallback.style.width = "100%";
+          fallback.style.height = "100%";
+          fallback.style.display = "flex";
+          fallback.style.alignItems = "center";
+          fallback.style.justifyContent = "center";
+          fallback.style.fontWeight = "800";
+          fallback.style.fontSize = "16px";
+          fallback.style.letterSpacing = ".5px";
+          fallback.textContent = (item.name || item.domain || "?").trim().slice(0,1).toUpperCase();
+          icon.appendChild(fallback);
+        };
+
+        img.src = item.icon || faviconUrl(item.url);
+        icon.appendChild(img);
+
+        const name = document.createElement("p");
+        name.className = "name";
+        name.textContent = item.name;
+
+        const domain = document.createElement("div");
+        domain.className = "domain";
+        domain.textContent = item.domain;
+
+        a.appendChild(menu);
+        a.appendChild(icon);
+        a.appendChild(name);
+        a.appendChild(domain);
+
+        elGrid.appendChild(a);
+      });
+    }
+
+    function addSite(){
+      const name = (elName.value || "").trim();
+      const url = normalizeUrl(elUrl.value);
+      if (!name){
+        toast("名字不能为空");
+        elName.focus();
+        return;
+      }
+      if (!url){
+        toast("网址必须正确，并且带 http:// 或 https://");
+        elUrl.focus();
+        return;
+      }
+
+      const domain = getDomain(url);
+      const exists = sites.some(s => s.url === url);
+      if (exists){
+        toast("这个网址已经添加过了");
+        return;
+      }
+
+      sites.unshift({
+        id: uid(),
+        name,
+        url,
+        domain,
+        icon: faviconUrl(url),
+        createdAt: Date.now()
+      });
+      saveSites(sites);
+
+      elName.value = "";
+      elUrl.value = "";
+      toast("已添加");
+      render();
+    }
+
+    function editItem(id){
+      const idx = sites.findIndex(s => s.id === id);
+      if (idx < 0) return;
+
+      const item = sites[idx];
+      const newName = prompt("修改名字：", item.name);
+      if (newName === null) return;
+
+      const newUrlInput = prompt("修改网址（必须带 http/https）：", item.url);
+      if (newUrlInput === null) return;
+
+      const newNameTrim = newName.trim();
+      const newUrl = normalizeUrl(newUrlInput);
+
+      if (!newNameTrim){
+        toast("名字不能为空");
+        return;
+      }
+      if (!newUrl){
+        toast("网址不正确（需要 http:// 或 https://）");
+        return;
+      }
+
+      // 防止改成别人的重复 url
+      if (sites.some(s => s.id !== id && s.url === newUrl)){
+        toast("这个网址已经存在");
+        return;
+      }
+
+      sites[idx] = {
+        ...item,
+        name: newNameTrim,
+        url: newUrl,
+        domain: getDomain(newUrl),
+        icon: faviconUrl(newUrl)
+      };
+      saveSites(sites);
+      toast("已保存");
+      render();
+    }
+
+    function delItem(id){
+      const idx = sites.findIndex(s => s.id === id);
+      if (idx < 0) return;
+      const ok = confirm(`删除「${sites[idx].name}」？`);
+      if (!ok) return;
+      sites.splice(idx, 1);
+      saveSites(sites);
+      toast("已删除");
+      render();
+    }
+
+    function sortByName(asc=true){
+      sites.sort((a,b) => {
+        const A = (a.name || "").toLowerCase();
+        const B = (b.name || "").toLowerCase();
+        if (A < B) return asc ? -1 : 1;
+        if (A > B) return asc ? 1 : -1;
+        return 0;
+      });
+      saveSites(sites);
+      render();
+    }
+
+    function clearAll(){
+      if (!sites.length){
+        toast("没有内容可清空");
+        return;
+      }
+      const ok = confirm("确定清空所有网站吗？（不可恢复）");
+      if (!ok) return;
+      sites = [];
+      saveSites(sites);
+      toast("已清空");
+      render();
+    }
+
+    function exportJson(){
+      const data = JSON.stringify({ version: 1, exportedAt: Date.now(), sites }, null, 2);
+      const blob = new Blob([data], {type: "application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "nav-sites-backup.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast("已导出");
+    }
+
+    function importJsonFile(file){
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const obj = JSON.parse(String(reader.result || ""));
+          const imported = obj?.sites;
+          if (!Array.isArray(imported)) throw new Error("bad");
+          // 轻度校验
+          const cleaned = imported
+            .map(s => {
+              const url = normalizeUrl(s.url);
+              const name = (s.name || "").trim();
+              if (!url || !name) return null;
+              return {
+                id: s.id || uid(),
+                name: name.slice(0,24),
+                url,
+                domain: getDomain(url),
+                icon: faviconUrl(url),
+                createdAt: s.createdAt || Date.now()
+              };
+            })
+            .filter(Boolean);
+
+          sites = cleaned;
+          saveSites(sites);
+          toast("已导入");
+          render();
+        }catch{
+          toast("导入失败：文件格式不对");
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
+    // 事件绑定
+    elAdd.addEventListener("click", addSite);
+    elUrl.addEventListener("keydown", (e) => { if (e.key === "Enter") addSite(); });
+    elName.addEventListener("keydown", (e) => { if (e.key === "Enter") elUrl.focus(); });
+
+    elSearch.addEventListener("input", render);
+    elSortAZ.addEventListener("click", () => sortByName(true));
+    elSortZA.addEventListener("click", () => sortByName(false));
+    elClear.addEventListener("click", clearAll);
+
+    elExport.addEventListener("click", exportJson);
+
+    elImportBtn.addEventListener("click", () => elImportFile.click());
+    elImportFile.addEventListener("change", () => {
+      const file = elImportFile.files?.[0];
+      if (file) importJsonFile(file);
+      elImportFile.value = "";
+    });
+
+    // 初始示例（第一次打开给 6 个常用站点，你也可以删掉这段）
+    if (sites.length === 0){
+      sites = [
+        { id: uid(), name: "YouTube", url: "https://www.youtube.com/", domain: "youtube.com", icon: "https://youtube.com/favicon.ico", createdAt: Date.now() },
+        { id: uid(), name: "Google", url: "https://www.google.com/", domain: "google.com", icon: "https://google.com/favicon.ico", createdAt: Date.now() },
+        { id: uid(), name: "GitHub", url: "https://github.com/", domain: "github.com", icon: "https://github.com/favicon.ico", createdAt: Date.now() },
+        { id: uid(), name: "Cloudflare", url: "https://dash.cloudflare.com/", domain: "dash.cloudflare.com", icon: "https://dash.cloudflare.com/favicon.ico", createdAt: Date.now() },
+        { id: uid(), name: "Outlook", url: "https://outlook.office.com/", domain: "outlook.office.com", icon: "https://outlook.office.com/favicon.ico", createdAt: Date.now() },
+        { id: uid(), name: "ChatGPT", url: "https://chat.openai.com/", domain: "chat.openai.com", icon: "https://chat.openai.com/favicon.ico", createdAt: Date.now() },
+      ];
+      saveSites(sites);
+    }
+
+    render();
+  </script>
 </body>
 </html>
