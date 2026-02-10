@@ -8,28 +8,43 @@
   <style>
     :root{
       --bg: #0b0c10;
-      --card: rgba(255,255,255,.08);
-      --cardHover: rgba(255,255,255,.12);
-      --border: rgba(255,255,255,.14);
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.62);
-      --shadow: 0 16px 40px rgba(0,0,0,.35);
-      --radius: 18px;
-      --radius2: 16px;
-      --tileSize: 104px;
-      --iconBox: 56px;
+
+      /* Edge-like surfaces */
+      --tile: rgba(255,255,255,.08);
+      --tileHover: rgba(255,255,255,.12);
+      --border: rgba(255,255,255,.14);
+      --shadow: 0 18px 46px rgba(0,0,0,.42);
+
+      /* Edge-like geometry */
+      --radius: 22px;
+      --radius2: 20px;
+
+      /* Key: “铺满”靠这两个 */
+      --tileMin: 118px;     /* 越小一行越多 */
+      --tilePad: 16px;
+      --gap: 12px;
+
+      /* Icon prominence */
+      --iconBox: 64px;
+      --iconSize: 34px;
+
       --accent: #7aa2ff;
     }
+
     @media (prefers-color-scheme: light){
       :root{
-        --bg: #f6f7fb;
-        --card: rgba(0,0,0,.05);
-        --cardHover: rgba(0,0,0,.07);
-        --border: rgba(0,0,0,.10);
+        --bg:#f6f7fb;
         --text: rgba(0,0,0,.88);
         --muted: rgba(0,0,0,.55);
-        --shadow: 0 12px 28px rgba(0,0,0,.10);
-        --accent: #3b6cff;
+
+        --tile: rgba(0,0,0,.045);
+        --tileHover: rgba(0,0,0,.065);
+        --border: rgba(0,0,0,.10);
+        --shadow: 0 14px 30px rgba(0,0,0,.12);
+
+        --accent:#3b6cff;
       }
     }
 
@@ -38,35 +53,45 @@
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC","Microsoft YaHei", Arial;
       background:
-        radial-gradient(1100px 800px at 15% 10%, rgba(122,162,255,.20), transparent 60%),
-        radial-gradient(900px 700px at 85% 15%, rgba(255,154,76,.16), transparent 60%),
+        radial-gradient(1200px 900px at 18% 10%, rgba(122,162,255,.18), transparent 60%),
+        radial-gradient(900px 700px at 85% 18%, rgba(255,154,76,.14), transparent 60%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
     }
 
+    /* 更像 Edge：内容区域更宽，左右边距更小 */
     .wrap{
-      max-width: 980px;
+      width: min(1100px, 100%);
       margin: 0 auto;
-      padding: 18px 16px 48px;
+      padding: 10px 12px 44px;
     }
 
-    /* Top bar: only a + button (Edge-like minimal) */
+    /* 只保留右上角 +，并且更像系统浮层 */
     .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 10;
       display:flex;
-      align-items:center;
       justify-content:flex-end;
-      padding: 6px 2px 14px;
-    }
-    .fab{
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.08);
+      padding: 8px 2px 10px;
+      background: linear-gradient(to bottom, rgba(0,0,0,.20), transparent);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    }
+    @media (prefers-color-scheme: light){
+      .topbar{
+        background: linear-gradient(to bottom, rgba(255,255,255,.65), transparent);
+      }
+    }
+
+    .fab{
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
       cursor:pointer;
       display:flex;
       align-items:center;
@@ -75,75 +100,99 @@
       user-select:none;
       -webkit-tap-highlight-color: transparent;
     }
-    .fab:hover{ background: rgba(255,255,255,.12); border-color: rgba(122,162,255,.28); }
+    .fab:hover{ background: rgba(255,255,255,.14); border-color: rgba(122,162,255,.28); }
     .fab:active{ transform: scale(.98); }
-    .fab svg{ width: 20px; height: 20px; fill: var(--text); opacity:.9; }
+    .fab svg{ width: 20px; height: 20px; fill: var(--text); opacity:.92; }
 
-    /* Grid */
+    /* 关键：Edge 那种“铺满磁贴” */
     .grid{
       display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(var(--tileSize), 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(var(--tileMin), 1fr));
+      gap: var(--gap);
       align-items: start;
     }
 
+    /* Edge 风格 tile：更大、边距更紧、阴影更“系统” */
     .tile{
       position: relative;
       border: 1px solid var(--border);
-      background: var(--card);
+      background: var(--tile);
       border-radius: var(--radius2);
-      padding: 14px 10px 12px;
+      padding: var(--tilePad) 12px 14px;
       text-decoration:none;
       color: inherit;
-      box-shadow: 0 10px 18px rgba(0,0,0,.14);
-      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      box-shadow: 0 12px 22px rgba(0,0,0,.16);
+      transition: transform .12s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
       outline: none;
       -webkit-tap-highlight-color: transparent;
+      overflow:hidden;
     }
+    .tile::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background: radial-gradient(240px 120px at 25% 20%, rgba(255,255,255,.10), transparent 60%);
+      opacity: .9;
+      pointer-events:none;
+    }
+    @media (prefers-color-scheme: light){
+      .tile::before{
+        background: radial-gradient(240px 120px at 25% 20%, rgba(0,0,0,.06), transparent 60%);
+      }
+    }
+
     .tile:hover{
       transform: translateY(-2px);
-      background: var(--cardHover);
+      background: var(--tileHover);
       border-color: rgba(122,162,255,.26);
+      box-shadow: 0 18px 34px rgba(0,0,0,.20);
     }
 
     .iconWrap{
       width: var(--iconBox);
       height: var(--iconBox);
-      border-radius: 16px;
+      border-radius: 18px;
       margin: 0 auto 10px;
       display:flex;
       align-items:center;
       justify-content:center;
+
+      /* 更高级：更像玻璃块 */
       background: rgba(255,255,255,.10);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
       overflow:hidden;
     }
+    @media (prefers-color-scheme: light){
+      .iconWrap{
+        background: rgba(255,255,255,.70);
+        border: 1px solid rgba(0,0,0,.10);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.60);
+      }
+    }
+
     .iconWrap img{
-      width: 30px;
-      height: 30px;
+      width: var(--iconSize);
+      height: var(--iconSize);
       object-fit: contain;
       image-rendering: -webkit-optimize-contrast;
     }
 
     .name{
       font-size: 13px;
-      font-weight: 650;
+      font-weight: 680;
       text-align:center;
       line-height: 1.2;
       margin: 0;
       word-break: break-word;
-    }
-    .domain{
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--muted);
-      text-align:center;
-      word-break: break-all;
-      display:none; /* Edge 默认不显示域名；你想显示就改成 block */
+      opacity: .95;
     }
 
+    /* Edge 默认不展示域名 */
+    .domain{ display:none; }
+
     .empty{
-      margin-top: 18px;
+      margin-top: 16px;
       border: 1px dashed var(--border);
       border-radius: var(--radius);
       padding: 18px 14px;
@@ -151,11 +200,11 @@
       text-align:center;
     }
 
-    /* Modal */
+    /* Modal: bottom sheet */
     .mask{
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.40);
+      background: rgba(0,0,0,.42);
       display:none;
       align-items: flex-end;
       justify-content:center;
@@ -163,16 +212,18 @@
       z-index: 50;
     }
     .mask.show{ display:flex; }
+
     .sheet{
       width: min(560px, 100%);
       border: 1px solid var(--border);
       background: rgba(255,255,255,.10);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: 22px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
       box-shadow: var(--shadow);
       overflow:hidden;
     }
+
     .sheetHeader{
       display:flex;
       align-items:center;
@@ -180,12 +231,12 @@
       padding: 14px 14px 10px;
     }
     .sheetTitle{
-      font-weight: 750;
+      font-weight: 760;
       letter-spacing: .2px;
     }
     .xbtn{
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,.08);
@@ -197,9 +248,8 @@
     }
     .xbtn svg{ width: 16px; height: 16px; fill: var(--text); opacity:.85; }
 
-    .sheetBody{
-      padding: 0 14px 14px;
-    }
+    .sheetBody{ padding: 0 14px 14px; }
+
     .field{
       border: 1px solid var(--border);
       background: rgba(255,255,255,.08);
@@ -235,21 +285,20 @@
       border-color: rgba(255,88,88,.35);
     }
 
-    /* Action sheet for long-press */
     .actions{
       padding: 10px 14px 14px;
       border-top: 1px solid var(--border);
       display:none;
     }
     .actions.show{ display:block; }
-    .actions .btn{ width: 100%; margin-top: 10px; }
+    .actions .btn{ width:100%; margin-top:10px; }
 
     .toast{
       position: fixed;
       left: 50%;
       bottom: 18px;
       transform: translateX(-50%);
-      background: rgba(0,0,0,.72);
+      background: rgba(0,0,0,.74);
       color: #fff;
       padding: 10px 12px;
       border-radius: 999px;
@@ -278,7 +327,7 @@
     <div id="empty" class="empty" style="display:none;">右上角点「＋」添加常用站点</div>
   </div>
 
-  <!-- Add / Edit modal -->
+  <!-- Add / Edit / Actions -->
   <div class="mask" id="mask">
     <div class="sheet" role="dialog" aria-modal="true">
       <div class="sheetHeader">
@@ -289,15 +338,14 @@
       </div>
 
       <div class="sheetBody">
-        <input class="field" id="siteName" placeholder="名字（可选）例如：YouTube / 邮箱" maxlength="24" />
-        <input class="field" id="siteUrl" placeholder="网址 例如：https://www.youtube.com" inputmode="url" />
+        <input class="field" id="siteName" placeholder="名字（可选）" maxlength="24" />
+        <input class="field" id="siteUrl" placeholder="网址（可直接填：youtube.com）" inputmode="url" />
         <div class="row">
           <button class="btn" id="btnCancel">取消</button>
           <button class="btn primary" id="btnSave">保存</button>
         </div>
       </div>
 
-      <!-- Long-press action sheet -->
       <div class="actions" id="actions">
         <button class="btn" id="btnEdit">编辑</button>
         <button class="btn danger" id="btnDelete">删除</button>
@@ -309,18 +357,15 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const STORAGE_KEY = "edge_like_sites_v2";
+    const STORAGE_KEY = "edge_like_sites_v3";
 
     const elGrid = document.getElementById("grid");
     const elEmpty = document.getElementById("empty");
-
     const elMask = document.getElementById("mask");
     const elActions = document.getElementById("actions");
-
     const elTitle = document.getElementById("sheetTitle");
     const elName = document.getElementById("siteName");
     const elUrl  = document.getElementById("siteUrl");
-
     const elToast = document.getElementById("toast");
 
     const btnAdd = document.getElementById("btnAdd");
@@ -335,38 +380,29 @@
     function toast(msg){
       elToast.textContent = msg;
       elToast.classList.add("show");
-      setTimeout(() => elToast.classList.remove("show"), 1700);
+      setTimeout(() => elToast.classList.remove("show"), 1600);
     }
-
     function uid(){
       return Math.random().toString(36).slice(2,10) + Date.now().toString(36);
     }
-
     function normalizeUrl(input){
       let s = (input || "").trim();
       if (!s) return null;
-      // 更像浏览器：用户不带协议也能加（自动补 https://）
       if (!/^https?:\/\//i.test(s)) s = "https://" + s;
       try{
         const u = new URL(s);
         if (!["http:", "https:"].includes(u.protocol)) return null;
         return u.toString();
-      }catch{
-        return null;
-      }
+      }catch{ return null; }
     }
-
     function getDomain(url){
       try{
         const u = new URL(url);
         return u.hostname.replace(/^www\./i, "");
-      }catch{
-        return "";
-      }
+      }catch{ return ""; }
     }
 
-    // 高清图标：优先 Google S2（比 Brave 新标签页那种清晰）
-    // fallback: duckduckgo 的 icons
+    // 高清图标优先：Google S2 -> DuckDuckGo -> /favicon.ico
     function iconCandidates(domain){
       const d = domain || "";
       return [
@@ -381,9 +417,7 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         const arr = raw ? JSON.parse(raw) : [];
         return Array.isArray(arr) ? arr : [];
-      }catch{
-        return [];
-      }
+      }catch{ return []; }
     }
     function save(arr){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
@@ -391,7 +425,7 @@
 
     let sites = load();
 
-    // 首次给几个默认项（你不想要可以删掉这段）
+    // 初次种子
     if (sites.length === 0){
       const seed = [
         ["YouTube","https://www.youtube.com/"],
@@ -401,24 +435,19 @@
         ["Outlook","https://outlook.office.com/"],
         ["ChatGPT","https://chat.openai.com/"],
       ];
-      sites = seed.map(([name,url]) => {
-        const domain = getDomain(url);
-        return { id: uid(), name, url, domain, createdAt: Date.now() };
-      });
+      sites = seed.map(([name,url]) => ({ id: uid(), name, url, domain: getDomain(url), createdAt: Date.now() }));
       save(sites);
     }
 
+    let editingId = null;
+    let actionId = null;
+
     function openModal(mode){
-      // mode: 'add' | 'edit' | 'actions'
-      if (mode === "actions"){
-        elActions.classList.add("show");
-      }else{
-        elActions.classList.remove("show");
-      }
+      if (mode === "actions") elActions.classList.add("show");
+      else elActions.classList.remove("show");
       elMask.classList.add("show");
       document.body.style.overflow = "hidden";
     }
-
     function closeModal(){
       elMask.classList.remove("show");
       elActions.classList.remove("show");
@@ -428,9 +457,6 @@
       elName.value = "";
       elUrl.value = "";
     }
-
-    let editingId = null;
-    let actionId = null;
 
     function render(){
       elGrid.innerHTML = "";
@@ -458,7 +484,6 @@
             img.src = candidates[idx];
             return;
           }
-          // 全失败 -> 字母占位（Edge 的兜底逻辑）
           iconWrap.innerHTML = "";
           const fallback = document.createElement("div");
           fallback.style.width = "100%";
@@ -468,7 +493,6 @@
           fallback.style.justifyContent = "center";
           fallback.style.fontWeight = "800";
           fallback.style.fontSize = "16px";
-          fallback.style.letterSpacing = ".4px";
           fallback.textContent = (item.name || item.domain || "?").trim().slice(0,1).toUpperCase();
           iconWrap.appendChild(fallback);
         };
@@ -480,18 +504,12 @@
         name.className = "name";
         name.textContent = item.name || item.domain;
 
-        const domain = document.createElement("div");
-        domain.className = "domain";
-        domain.textContent = item.domain;
-
         a.appendChild(iconWrap);
         a.appendChild(name);
-        a.appendChild(domain);
 
-        // 长按（手机）弹出操作：编辑/删除
+        // 长按弹出操作
         let pressTimer = null;
         const startPress = (e) => {
-          // 避免滚动时误触
           pressTimer = setTimeout(() => {
             e.preventDefault();
             actionId = item.id;
@@ -506,8 +524,6 @@
         a.addEventListener("touchstart", startPress, {passive:false});
         a.addEventListener("touchend", cancelPress);
         a.addEventListener("touchmove", cancelPress);
-
-        // 桌面端右键
         a.addEventListener("contextmenu", (e) => {
           e.preventDefault();
           actionId = item.id;
@@ -516,43 +532,6 @@
 
         elGrid.appendChild(a);
       });
-    }
-
-    function addOrEdit(){
-      const url = normalizeUrl(elUrl.value);
-      const name = (elName.value || "").trim();
-
-      if (!url){
-        toast("网址不对（建议直接粘贴完整链接）");
-        elUrl.focus();
-        return;
-      }
-
-      const domain = getDomain(url);
-      const finalName = name || domain;
-
-      // 去重：同 url 不重复
-      const exists = sites.some(s => s.url === url && s.id !== editingId);
-      if (exists){
-        toast("这个网址已经存在");
-        return;
-      }
-
-      if (editingId){
-        const idx = sites.findIndex(s => s.id === editingId);
-        if (idx >= 0){
-          sites[idx] = { ...sites[idx], name: finalName, url, domain };
-          save(sites);
-          toast("已保存");
-        }
-      }else{
-        sites.unshift({ id: uid(), name: finalName, url, domain, createdAt: Date.now() });
-        save(sites);
-        toast("已添加");
-      }
-
-      closeModal();
-      render();
     }
 
     function openAdd(){
@@ -576,12 +555,44 @@
       setTimeout(() => elName.focus(), 80);
     }
 
+    function addOrEdit(){
+      const url = normalizeUrl(elUrl.value);
+      const name = (elName.value || "").trim();
+      if (!url){
+        toast("网址不对（建议直接粘贴完整链接）");
+        elUrl.focus();
+        return;
+      }
+      const domain = getDomain(url);
+      const finalName = name || domain;
+
+      if (sites.some(s => s.url === url && s.id !== editingId)){
+        toast("这个网址已经存在");
+        return;
+      }
+
+      if (editingId){
+        const idx = sites.findIndex(s => s.id === editingId);
+        if (idx >= 0){
+          sites[idx] = { ...sites[idx], name: finalName, url, domain };
+          save(sites);
+          toast("已保存");
+        }
+      }else{
+        sites.unshift({ id: uid(), name: finalName, url, domain, createdAt: Date.now() });
+        save(sites);
+        toast("已添加");
+      }
+
+      closeModal();
+      render();
+    }
+
     function removeOne(id){
       const idx = sites.findIndex(s => s.id === id);
       if (idx < 0) return;
       const name = sites[idx].name || sites[idx].domain;
-      const ok = confirm(`删除「${name}」？`);
-      if (!ok) return;
+      if (!confirm(`删除「${name}」？`)) return;
       sites.splice(idx, 1);
       save(sites);
       toast("已删除");
@@ -599,22 +610,13 @@
       if (e.key === "Enter") addOrEdit();
     });
 
-    // clicking outside sheet closes
     elMask.addEventListener("click", (e) => {
       if (e.target === elMask) closeModal();
     });
 
     btnActionClose.addEventListener("click", closeModal);
-
-    btnEdit.addEventListener("click", () => {
-      if (!actionId) return;
-      openEdit(actionId);
-    });
-
-    btnDelete.addEventListener("click", () => {
-      if (!actionId) return;
-      removeOne(actionId);
-    });
+    btnEdit.addEventListener("click", () => actionId && openEdit(actionId));
+    btnDelete.addEventListener("click", () => actionId && removeOne(actionId));
 
     render();
   </script>
