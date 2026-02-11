@@ -1,189 +1,672 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>常用站点</title>
-
+<meta name="color-scheme" content="light dark" />
 <style>
-:root{
-  --bg:#f6f7fb;
-  --text:#111;
-  --box:#fff;
-  --radius:18px;
-  --gap:14px;
-}
-@media(prefers-color-scheme:dark){
-  :root{--bg:#0b0c10;--text:#fff;--box:#fff}
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system;
-  background:var(--bg);
-  color:var(--text);
-}
-.wrap{max-width:1100px;margin:0 auto;padding:12px}
-.topbar{display:flex;justify-content:flex-end}
-.add{
-  width:44px;height:44px;border-radius:50%;
-  border:none;background:rgba(0,0,0,.1);
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:var(--gap);
-}
-@media(min-width:768px){
-  .grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
-}
-.site{text-align:center;text-decoration:none;color:inherit}
-.site:hover{transform:scale(1.06)}
-.icon-box{
-  width:100%;aspect-ratio:1/1;
-  border-radius:var(--radius);
-  background:var(--box);
-  display:flex;align-items:center;justify-content:center;
-}
-.icon-box img{width:72%;height:72%;object-fit:contain}
-.name{margin-top:6px;font-size:13px;font-weight:600}
-.menu{
-  position:fixed;z-index:20;
-  background:#000;color:#fff;
-  border-radius:12px;padding:6px;
-  display:none;
-}
-.menu button{
-  display:block;width:100%;
-  background:none;border:none;
-  color:#fff;padding:8px 14px;
-  text-align:left;
-}
+  :root{
+    --bg:#f6f7fb;
+    --text:rgba(0,0,0,.88);
+    --muted:rgba(0,0,0,.55);
+    --box:#ffffff;
+    --radius:18px;
+    --gap:14px;
+    --tap: rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b0c10;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.65);
+      --box:rgba(255,255,255,.92);
+      --tap: rgba(255,255,255,.10);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC","Microsoft YaHei", Arial;
+    background:
+      radial-gradient(1200px 900px at 20% 10%, rgba(120,150,255,.18), transparent 60%),
+      radial-gradient(900px 700px at 85% 20%, rgba(255,170,100,.14), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:10px 12px 56px;
+  }
+
+  /* 顶部：只放一个 + 和一个小“同步”入口（不打扰） */
+  .topbar{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    padding:4px 4px 12px;
+  }
+  .iconBtn{
+    width:44px;height:44px;border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text);
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-color-scheme: light){
+    .iconBtn{ background: rgba(0,0,0,.07); }
+  }
+  .iconBtn svg{ width:20px;height:20px; fill: var(--text); opacity:.92; }
+
+  /* Edge：手机固定 4 列；桌面自适应 */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:var(--gap);
+  }
+  @media (min-width:768px){
+    .grid{
+      grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    }
+  }
+
+  .site{
+    text-decoration:none;
+    color:inherit;
+    text-align:center;
+    padding:6px 4px 10px;
+    border-radius:16px;
+    transition: transform .12s ease, background .12s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select:none;
+  }
+  .site:active{ background: var(--tap); }
+  .site:hover{ transform:scale(1.06); }
+
+  /* Edge 同款：统一圆角框 */
+  .icon-box{
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:var(--radius);
+    background:var(--box);
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    margin-bottom:8px;
+  }
+  /* 关键：图标强制一致占比（不会大小不一） */
+  .icon-box img{
+    width:72%;
+    height:72%;
+    object-fit:contain;
+  }
+  .name{
+    font-size:13px;
+    font-weight:600;
+    line-height:1.2;
+    opacity:.95;
+    word-break: break-word;
+  }
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    padding:22px 10px;
+  }
+
+  /* 底部弹层（添加/同步码） */
+  .mask{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:30;
+  }
+  .mask.show{ display:flex; }
+
+  .panel{
+    width:100%;
+    max-width:560px;
+    border-radius:22px 22px 0 0;
+    padding:16px;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  @media (prefers-color-scheme: dark){
+    .panel{ background: rgba(30,30,34,.92); }
+  }
+  .panelTitle{
+    font-weight:750;
+    margin:0 0 8px;
+    letter-spacing:.2px;
+  }
+  .hint{
+    margin:0 0 10px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.4;
+  }
+  .input{
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    border:none;
+    border-radius:14px;
+    background:rgba(0,0,0,.06);
+    font-size:15px;
+    color:var(--text);
+    outline:none;
+  }
+  @media (prefers-color-scheme: dark){
+    .input{ background: rgba(255,255,255,.14); color:#fff; }
+  }
+  .row{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+  }
+  .btn{
+    flex:1;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:rgba(0,0,0,.08);
+    font-size:15px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  @media (prefers-color-scheme: dark){
+    .btn{ background: rgba(255,255,255,.14); color:#fff; }
+  }
+  .btn.primary{
+    background: linear-gradient(135deg,#7aa2ff,#5b7cff);
+    color:#fff;
+  }
+  .btn.danger{
+    background: linear-gradient(135deg,#ff6b6b,#ff4d4d);
+    color:#fff;
+  }
+
+  /* 长按/右键菜单 */
+  .menu{
+    position:fixed;
+    z-index:40;
+    display:none;
+    min-width: 160px;
+    border-radius:14px;
+    background: rgba(0,0,0,.85);
+    color:#fff;
+    padding:6px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .menu button{
+    width:100%;
+    border:none;
+    background:transparent;
+    color:#fff;
+    padding:10px 12px;
+    border-radius:10px;
+    text-align:left;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .menu button:active{ background: rgba(255,255,255,.14); }
+
+  /* Toast */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:18px;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.74);
+    color:#fff;
+    padding:10px 12px;
+    border-radius:999px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .18s ease;
+    z-index:50;
+    max-width: calc(100vw - 24px);
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+  }
+  .toast.show{ opacity:1; }
 </style>
 </head>
 
 <body>
 <div class="wrap">
   <div class="topbar">
-    <button class="add" id="addBtn">＋</button>
+    <!-- 同步 -->
+    <button class="iconBtn" id="syncBtn" aria-label="同步">
+      <svg viewBox="0 0 24 24"><path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 .9-.24 1.74-.66 2.47l1.46 1.46C18.55 16.84 19 15.47 19 13c0-3.87-3.13-7-7-7zm-5.34 2.53L5.2 7.07C4.45 8.16 4 9.53 4 11c0 3.87 3.13 7 7 7v3l4-4-4-4v3c-2.76 0-5-2.24-5-5 0-.9.24-1.74.66-2.47z"/></svg>
+    </button>
+    <!-- 添加 -->
+    <button class="iconBtn" id="addBtn" aria-label="添加">
+      <svg viewBox="0 0 24 24"><path d="M11 5h2v14h-2V5zm-6 6h14v2H5v-2z"/></svg>
+    </button>
   </div>
+
   <div id="grid" class="grid"></div>
+  <div id="empty" class="empty" style="display:none;">点右上角 + 添加常用站点</div>
 </div>
 
+<!-- 右键/长按菜单 -->
 <div id="menu" class="menu">
-  <button id="removeBtn">移出站点</button>
+  <button id="menuRemove">移出站点</button>
+  <button id="menuCancel">取消</button>
 </div>
+
+<!-- 添加弹层 -->
+<div id="maskAdd" class="mask">
+  <div class="panel">
+    <p class="panelTitle">添加站点</p>
+    <p class="hint">只要填网址即可；名称可不填（自动用域名）。</p>
+    <input id="addName" class="input" placeholder="名称（可选）" maxlength="24" />
+    <input id="addUrl" class="input" placeholder="网址，例如 youtube.com 或 https://youtube.com" inputmode="url" />
+    <div class="row">
+      <button class="btn" id="addCancel">取消</button>
+      <button class="btn primary" id="addSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 同步弹层 -->
+<div id="maskSync" class="mask">
+  <div class="panel">
+    <p class="panelTitle">同步</p>
+    <p class="hint">
+      Edge 的同步靠账号；我们用“同步码”实现同样效果。<br>
+      让所有浏览器/设备输入同一个同步码，即可共享同一份站点列表。
+    </p>
+    <input id="syncId" class="input" placeholder="同步码（复制粘贴一串）" />
+    <div class="row">
+      <button class="btn" id="syncCancel">关闭</button>
+      <button class="btn" id="syncCopy">复制本机同步码</button>
+    </div>
+    <div class="row">
+      <button class="btn danger" id="syncApply">使用该同步码并拉取云端</button>
+      <button class="btn primary" id="syncPush">把本机覆盖到云端</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-/* =====================
-   配置区（只看这里）
-===================== */
+/* ==========================
+   1) 只改这里：Worker 地址
+========================== */
+const SYNC_ENDPOINT = "https://edge-sync.kunjuamoorah944.workers.dev"; // ← 改成你的 Worker
+/* ========================== */
 
-// 是否开启云同步
-const ENABLE_SYNC = true;
+const STORAGE_KEY = "edge_sites_v1";
+const LOCAL_SYNC_ID_KEY = "edge_sync_id_v1";
 
-// 你的 Cloudflare Worker 地址
-const SYNC_ENDPOINT = "https://YOUR_WORKER_URL/sync";
+// 站点数据结构：{ name: string, url: string }
+let sites = [];
+let menuIndex = null;
 
-/* ===================== */
+// UI
+const gridEl = document.getElementById("grid");
+const emptyEl = document.getElementById("empty");
+const toastEl = document.getElementById("toast");
 
-const KEY="edge_sites";
-let sites=[];
-let currentIndex=null;
+const addBtn = document.getElementById("addBtn");
+const syncBtn = document.getElementById("syncBtn");
 
-function uid(){
-  return localStorage.getItem("sync_id")
-    || (localStorage.setItem("sync_id",crypto.randomUUID()),
-        localStorage.getItem("sync_id"));
+const maskAdd = document.getElementById("maskAdd");
+const addName = document.getElementById("addName");
+const addUrl = document.getElementById("addUrl");
+const addCancel = document.getElementById("addCancel");
+const addSave = document.getElementById("addSave");
+
+const maskSync = document.getElementById("maskSync");
+const syncIdInput = document.getElementById("syncId");
+const syncCancel = document.getElementById("syncCancel");
+const syncCopy = document.getElementById("syncCopy");
+const syncApply = document.getElementById("syncApply");
+const syncPush = document.getElementById("syncPush");
+
+const menuEl = document.getElementById("menu");
+const menuRemove = document.getElementById("menuRemove");
+const menuCancel = document.getElementById("menuCancel");
+
+/* ---------- Utils ---------- */
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(()=>toastEl.classList.remove("show"), 1600);
 }
 
+function normalizeUrl(input){
+  let s = (input || "").trim();
+  if (!s) return null;
+  if (!/^https?:\/\//i.test(s)) s = "https://" + s;
+  try{
+    const u = new URL(s);
+    if (!["http:","https:"].includes(u.protocol)) return null;
+    return u.toString();
+  }catch{
+    return null;
+  }
+}
+function domainOf(url){
+  try{
+    return new URL(url).hostname.replace(/^www\./i,"");
+  }catch{
+    return "";
+  }
+}
+
+/* ---------- Edge-style icon strategy ---------- */
 function icon(domain){
-  const map={
-    "github.com":"https://github.githubassets.com/favicons/favicon.svg",
-    "outlook.com":"https://res.cdn.office.net/assets/mail/pwa/v1/icons/favicon-32x32.png",
-    "youtube.com":"https://www.youtube.com/s/desktop/favicon_144.png",
-    "google.com":"https://www.google.com/favicon.ico",
-    "cloudflare.com":"https://www.cloudflare.com/favicon.ico"
+  const map = {
+    "github.com": "https://github.githubassets.com/favicons/favicon.svg",
+    "outlook.com": "https://res.cdn.office.net/assets/mail/pwa/v1/icons/favicon-32x32.png",
+    "outlook.office.com": "https://res.cdn.office.net/assets/mail/pwa/v1/icons/favicon-32x32.png",
+    "cloudflare.com": "https://www.cloudflare.com/favicon.ico",
+    "youtube.com": "https://www.youtube.com/s/desktop/fe2c7f5b/img/favicon_144x144.png",
+    "google.com": "https://www.google.com/favicon.ico",
+    "chat.openai.com": "https://chat.openai.com/favicon.ico",
+    "gemini.google.com": "https://www.gstatic.com/lamda/images/favicon_v1_64.png"
   };
-  return map[domain]||
-    `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  return map[domain] || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
 }
 
-async function syncLoad(){
-  if(!ENABLE_SYNC) return null;
-  const r=await fetch(SYNC_ENDPOINT+"?id="+uid());
-  if(r.ok) return r.json();
+/* ---------- Local storage ---------- */
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch{ return []; }
+}
+function saveLocal(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sites));
 }
 
-async function syncSave(data){
-  if(!ENABLE_SYNC) return;
-  await fetch(SYNC_ENDPOINT,{
+/* ---------- Sync ID ---------- */
+function getLocalSyncId(){
+  let id = localStorage.getItem(LOCAL_SYNC_ID_KEY);
+  if (!id){
+    // crypto.randomUUID 兼容性：现代浏览器都有；不行就 fallback
+    id = (crypto && crypto.randomUUID) ? crypto.randomUUID() :
+      (Math.random().toString(36).slice(2) + Date.now().toString(36));
+    localStorage.setItem(LOCAL_SYNC_ID_KEY, id);
+  }
+  return id;
+}
+function setLocalSyncId(id){
+  localStorage.setItem(LOCAL_SYNC_ID_KEY, id);
+}
+
+/* ---------- Cloud sync (Worker + KV) ---------- */
+async function cloudGet(syncId){
+  const r = await fetch(`${SYNC_ENDPOINT}?id=${encodeURIComponent(syncId)}`, { method:"GET" });
+  if (!r.ok) throw new Error("cloud get failed");
+  return r.json(); // returns null or array
+}
+async function cloudPut(syncId, data){
+  const r = await fetch(SYNC_ENDPOINT, {
     method:"POST",
-    body:JSON.stringify({id:uid(),data})
+    headers: { "Content-Type":"application/json" },
+    body: JSON.stringify({ id: syncId, data })
   });
+  if (!r.ok) throw new Error("cloud put failed");
 }
 
-function load(){
-  const local=JSON.parse(localStorage.getItem(KEY)||"[]");
-  if(local.length) sites=local;
-}
-
-async function init(){
-  load();
-  const cloud=await syncLoad();
-  if(cloud){sites=cloud;save(false)}
-  render();
-}
-
-function save(sync=true){
-  localStorage.setItem(KEY,JSON.stringify(sites));
-  if(sync) syncSave(sites);
-}
-
+/* ---------- Render ---------- */
 function render(){
-  const g=document.getElementById("grid");
-  g.innerHTML="";
-  sites.forEach((s,i)=>{
-    const d=new URL(s.url).hostname.replace("www.","");
-    const a=document.createElement("a");
-    a.className="site";
-    a.innerHTML=`
-      <div class="icon-box"><img src="${icon(d)}"></div>
-      <div class="name">${s.name||d}</div>`;
-    a.onclick=()=>location.href=s.url;
-    a.oncontextmenu=e=>{
+  gridEl.innerHTML = "";
+  emptyEl.style.display = sites.length ? "none" : "block";
+
+  sites.forEach((s, idx) => {
+    const url = s.url;
+    const d = domainOf(url);
+    const name = (s.name && s.name.trim()) ? s.name.trim() : d;
+
+    const a = document.createElement("a");
+    a.className = "site";
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    a.innerHTML = `
+      <div class="icon-box"><img alt="${name}" src="${icon(d)}"></div>
+      <div class="name">${escapeHtml(name)}</div>
+    `;
+
+    // 右键（电脑）
+    a.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      currentIndex=i;
-      showMenu(e.clientX,e.clientY);
-    };
-    g.appendChild(a);
+      openMenuAt(idx, e.clientX, e.clientY);
+    });
+
+    // 长按（手机）
+    let pressTimer = null;
+    a.addEventListener("touchstart", (e) => {
+      pressTimer = setTimeout(() => {
+        e.preventDefault();
+        // touch 坐标
+        const t = e.touches && e.touches[0] ? e.touches[0] : null;
+        const x = t ? t.clientX : (window.innerWidth/2);
+        const y = t ? t.clientY : (window.innerHeight/2);
+        openMenuAt(idx, x, y);
+      }, 420);
+    }, { passive:false });
+
+    const cancelPress = () => { if (pressTimer) clearTimeout(pressTimer); pressTimer=null; };
+    a.addEventListener("touchend", cancelPress);
+    a.addEventListener("touchmove", cancelPress);
+
+    gridEl.appendChild(a);
   });
 }
 
-function showMenu(x,y){
-  const m=document.getElementById("menu");
-  m.style.left=x+"px";
-  m.style.top=y+"px";
-  m.style.display="block";
+function escapeHtml(str){
+  return (str||"").replace(/[&<>"']/g, (m) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
 }
 
-document.body.onclick=()=>menu.style.display="none";
+/* ---------- Menu (remove) ---------- */
+function openMenuAt(idx, x, y){
+  menuIndex = idx;
 
-removeBtn.onclick=()=>{
-  sites.splice(currentIndex,1);
-  save();
+  // 防止出屏
+  const pad = 8;
+  menuEl.style.display = "block";
+  const w = menuEl.offsetWidth;
+  const h = menuEl.offsetHeight;
+  const left = Math.max(pad, Math.min(x, window.innerWidth - w - pad));
+  const top  = Math.max(pad, Math.min(y, window.innerHeight - h - pad));
+
+  menuEl.style.left = left + "px";
+  menuEl.style.top  = top + "px";
+}
+function closeMenu(){
+  menuEl.style.display = "none";
+  menuIndex = null;
+}
+
+menuCancel.addEventListener("click", closeMenu);
+menuRemove.addEventListener("click", async () => {
+  if (menuIndex === null) return;
+  const removed = sites.splice(menuIndex, 1);
+  saveLocal();
   render();
-};
+  closeMenu();
+  toast("已移出站点");
+  // 同步：把本机覆盖到云端
+  try{
+    await cloudPut(getLocalSyncId(), sites);
+  }catch{
+    // 不打断体验
+  }
+});
 
-addBtn.onclick=()=>{
-  const url=prompt("网址");
-  if(!url) return;
-  sites.unshift({url});
-  save();
+// 点击空白关闭菜单
+document.addEventListener("click", (e) => {
+  if (menuEl.style.display === "block" && !menuEl.contains(e.target)) closeMenu();
+});
+document.addEventListener("scroll", () => { if (menuEl.style.display === "block") closeMenu(); }, { passive:true });
+
+/* ---------- Add modal ---------- */
+function openAdd(){
+  maskAdd.classList.add("show");
+  addName.value = "";
+  addUrl.value = "";
+  setTimeout(()=>addUrl.focus(), 80);
+}
+function closeAdd(){ maskAdd.classList.remove("show"); }
+
+addBtn.addEventListener("click", openAdd);
+addCancel.addEventListener("click", closeAdd);
+maskAdd.addEventListener("click", (e)=>{ if(e.target===maskAdd) closeAdd(); });
+
+addSave.addEventListener("click", async () => {
+  const url = normalizeUrl(addUrl.value);
+  if (!url){
+    toast("网址不对");
+    addUrl.focus();
+    return;
+  }
+  const d = domainOf(url);
+  const name = (addName.value || "").trim() || d;
+
+  // 去重（按 url）
+  if (sites.some(s => s.url === url)){
+    toast("已存在");
+    closeAdd();
+    return;
+  }
+
+  sites.unshift({ name, url });
+  saveLocal();
   render();
-};
+  closeAdd();
+  toast("已添加");
 
-init();
+  // 同步上云
+  try{
+    await cloudPut(getLocalSyncId(), sites);
+  }catch{
+    // 不打断体验
+  }
+});
+
+addUrl.addEventListener("keydown", (e) => { if(e.key==="Enter") addSave.click(); });
+
+/* ---------- Sync modal ---------- */
+function openSync(){
+  maskSync.classList.add("show");
+  syncIdInput.value = getLocalSyncId();
+}
+function closeSync(){ maskSync.classList.remove("show"); }
+
+syncBtn.addEventListener("click", openSync);
+syncCancel.addEventListener("click", closeSync);
+maskSync.addEventListener("click", (e)=>{ if(e.target===maskSync) closeSync(); });
+
+syncCopy.addEventListener("click", async () => {
+  const id = getLocalSyncId();
+  try{
+    await navigator.clipboard.writeText(id);
+    toast("已复制同步码");
+  }catch{
+    // 兼容：不支持 clipboard 的就直接选中
+    syncIdInput.focus();
+    syncIdInput.select();
+    toast("长按复制同步码");
+  }
+});
+
+syncApply.addEventListener("click", async () => {
+  const id = (syncIdInput.value || "").trim();
+  if (!id){ toast("同步码不能为空"); return; }
+
+  setLocalSyncId(id);
+  toast("正在拉取云端…");
+
+  try{
+    const cloud = await cloudGet(id);
+    if (Array.isArray(cloud)){
+      sites = cloud;
+      saveLocal();
+      render();
+      toast("已同步（云端 → 本机）");
+      closeSync();
+    }else{
+      // 云端没数据
+      sites = loadLocal();
+      render();
+      toast("云端为空，可点“本机覆盖云端”");
+    }
+  }catch{
+    toast("拉取失败（检查 Worker/KV）");
+  }
+});
+
+syncPush.addEventListener("click", async () => {
+  const id = getLocalSyncId();
+  toast("正在上传云端…");
+  try{
+    await cloudPut(id, sites);
+    toast("已同步（本机 → 云端）");
+    closeSync();
+  }catch{
+    toast("上传失败（检查 Worker/KV）");
+  }
+});
+
+/* ---------- Startup: load local then try cloud ---------- */
+async function start(){
+  sites = loadLocal();
+
+  // 如果本地为空，给一点种子（可删）
+  if (!sites.length){
+    sites = [
+      {name:"YouTube", url:"https://www.youtube.com"},
+      {name:"Google", url:"https://www.google.com"},
+      {name:"GitHub", url:"https://github.com"},
+      {name:"Cloudflare", url:"https://dash.cloudflare.com"},
+      {name:"Outlook", url:"https://outlook.office.com"},
+      {name:"ChatGPT", url:"https://chat.openai.com"}
+    ];
+    saveLocal();
+  }
+
+  render();
+
+  // 启动时：优先拉云端覆盖本机（Edge 心智：云端为准）
+  const id = getLocalSyncId();
+  try{
+    const cloud = await cloudGet(id);
+    if (Array.isArray(cloud)){
+      sites = cloud;
+      saveLocal();
+      render();
+    }else{
+      // 云端没有 -> 把本机推上去，后续设备能拿到
+      await cloudPut(id, sites);
+    }
+  }catch{
+    // 云不可用时也不影响使用
+  }
+}
+
+start();
 </script>
 </body>
 </html>
