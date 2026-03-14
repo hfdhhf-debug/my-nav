@@ -1,252 +1,687 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人导航</title>
-    <style>
-        :root {
-            --bg-color: #f4f6f8;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --hover-bg: #e8f0fe;
-            --primary-color: #1a73e8;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>导航首页</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: rgba(255,255,255,0.06);
+      --card: rgba(255,255,255,0.08);
+      --card-hover: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.12);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --danger: #f87171;
+      --shadow: 0 12px 40px rgba(0,0,0,0.28);
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * { box-sizing: border-box; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,0.18), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(168,85,247,0.16), transparent 22%),
+        linear-gradient(135deg, #020617, #0f172a 45%, #111827);
+      color: var(--text);
+      min-height: 100vh;
+    }
 
-        /* 时钟和搜索区域 */
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            width: 100%;
-            max-width: 600px;
-        }
+    .container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 32px auto 48px;
+    }
 
-        .clock {
-            font-size: 3rem;
-            font-weight: 300;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
+    .hero {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
 
-        .search-box {
-            display: flex;
-            width: 100%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border-radius: 24px;
-            overflow: hidden;
-            background: var(--card-bg);
-            transition: box-shadow 0.3s ease;
-        }
+    .title {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
 
-        .search-box:focus-within {
-            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-        }
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
 
-        .search-box input {
-            flex: 1;
-            border: none;
-            padding: 15px 20px;
-            font-size: 16px;
-            outline: none;
-            background: transparent;
-        }
+    .topbar {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
 
-        .search-box button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: background 0.3s ease;
-        }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0 14px;
+      min-height: 54px;
+    }
 
-        .search-box button:hover {
-            background: #1557b0;
-        }
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 15px;
+    }
 
-        /* 导航分组区域 */
-        .nav-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 1000px;
-        }
+    .search-box input::placeholder { color: #94a3b8; }
 
-        .group-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            transition: transform 0.2s ease;
-        }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-        .group-card:hover {
-            transform: translateY(-2px);
-        }
+    button {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
 
-        .group-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .primary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      box-shadow: 0 10px 24px rgba(37,99,235,0.32);
+    }
 
-        .site-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
+    .ghost {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
 
-        .site-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            text-decoration: none;
-            color: var(--text-main);
-            border-radius: 8px;
-            transition: background 0.2s ease;
-            gap: 10px;
-        }
+    .danger {
+      background: rgba(248,113,113,0.14);
+      color: #fecaca;
+      border: 1px solid rgba(248,113,113,0.28);
+    }
 
-        .site-item:hover {
-            background: var(--hover-bg);
-            color: var(--primary-color);
-        }
+    button:hover { transform: translateY(-1px); }
 
-        .site-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            background: #f0f2f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
+    .groups {
+      margin-top: 24px;
+      display: grid;
+      gap: 18px;
+    }
 
-        .site-name {
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .group {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
 
-        /* 响应式设计 */
-        @media (max-width: 600px) {
-            .site-list {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .group-title-wrap {
+      min-width: 0;
+    }
+
+    .group-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .group-meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .group-tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .links-grid {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .link-card {
+      position: relative;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      text-decoration: none;
+      color: var(--text);
+      transition: 0.2s ease;
+      min-height: 84px;
+    }
+
+    .link-card:hover {
+      background: var(--card-hover);
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.16);
+    }
+
+    .favicon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .favicon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .link-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .link-name {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .link-url {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .delete-link {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      padding: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.85);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 14px;
+    }
+
+    .link-card:hover .delete-link { display: flex; }
+
+    .empty {
+      padding: 28px 18px 30px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-mask.show { display: flex; }
+
+    .modal {
+      width: min(520px, 100%);
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .modal-body {
+      padding: 18px 22px 22px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .footer-tip {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .container { width: min(100% - 20px, 1200px); margin-top: 20px; }
+      .hero { padding: 20px; border-radius: 20px; }
+      .topbar { grid-template-columns: 1fr; }
+      .group-header { flex-direction: column; align-items: flex-start; }
+      .group-tools { width: 100%; justify-content: flex-start; }
+      .links-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <section class="hero">
+      <h1 class="title">我的导航首页</h1>
+      <p class="subtitle">支持自定义分组、添加网站、删除网站，数据会自动保存在浏览器本地。适合当作浏览器首页或个人常用网址导航页。</p>
 
-    <div class="header">
-        <div class="clock" id="clock">00:00</div>
-        <form class="search-box" action="https://www.baidu.com/s" method="get" target="_blank">
-            <input type="text" name="wd" placeholder="在百度搜索..." autocomplete="off" required>
-            <button type="submit">搜索</button>
-        </form>
+      <div class="topbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input id="searchInput" type="text" placeholder="搜索分组或网站名称..." />
+        </div>
+        <div class="actions">
+          <button class="primary" id="addGroupBtn">+ 添加分组</button>
+          <button class="ghost" id="resetBtn">恢复默认</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="groups" id="groupsContainer"></section>
+
+    <div class="footer-tip">提示：点击卡片可打开网站；右上角按钮可新增分组或恢复默认内容。</div>
+  </div>
+
+  <div class="modal-mask" id="modalMask">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">添加内容</h3>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
     </div>
+  </div>
 
-    <div class="nav-container">
-        
-        <div class="group-card">
-            <div class="group-title">🎬 影音娱乐</div>
-            <div class="site-list">
-                <a href="https://www.bilibili.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #fb7299;">B</span>
-                    <span class="site-name">哔哩哔哩</span>
-                </a>
-                <a href="https://www.youtube.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #ff0000;">Y</span>
-                    <span class="site-name">YouTube</span>
-                </a>
-                <a href="https://y.qq.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #31c27c;">Q</span>
-                    <span class="site-name">QQ音乐</span>
-                </a>
-                <a href="https://www.douban.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #007722;">D</span>
-                    <span class="site-name">豆瓣</span>
-                </a>
+  <script>
+    const STORAGE_KEY = 'custom_nav_home_data_v1';
+
+    const defaultData = [
+      {
+        id: crypto.randomUUID(),
+        name: '常用',
+        links: [
+          { id: crypto.randomUUID(), name: 'Google', url: 'https://www.google.com' },
+          { id: crypto.randomUUID(), name: 'YouTube', url: 'https://www.youtube.com' },
+          { id: crypto.randomUUID(), name: 'GitHub', url: 'https://github.com' }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        name: '社交',
+        links: [
+          { id: crypto.randomUUID(), name: 'X', url: 'https://x.com' },
+          { id: crypto.randomUUID(), name: 'Bilibili', url: 'https://www.bilibili.com' }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        name: '工具',
+        links: [
+          { id: crypto.randomUUID(), name: 'ChatGPT', url: 'https://chatgpt.com' },
+          { id: crypto.randomUUID(), name: 'Cloudflare', url: 'https://dash.cloudflare.com' }
+        ]
+      }
+    ];
+
+    let groups = loadData();
+    const groupsContainer = document.getElementById('groupsContainer');
+    const modalMask = document.getElementById('modalMask');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const searchInput = document.getElementById('searchInput');
+
+    document.getElementById('addGroupBtn').addEventListener('click', openAddGroupModal);
+    document.getElementById('resetBtn').addEventListener('click', resetData);
+    searchInput.addEventListener('input', render);
+    modalMask.addEventListener('click', (e) => {
+      if (e.target === modalMask) closeModal();
+    });
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultData);
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : structuredClone(defaultData);
+      } catch {
+        return structuredClone(defaultData);
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+    }
+
+    function normalizeUrl(url) {
+      if (!/^https?:\/\//i.test(url)) return 'https://' + url;
+      return url;
+    }
+
+    function getDomain(url) {
+      try {
+        return new URL(url).hostname.replace(/^www\./, '');
+      } catch {
+        return url;
+      }
+    }
+
+    function getInitial(name) {
+      return (name || '?').trim().slice(0, 1).toUpperCase();
+    }
+
+    function faviconUrl(url) {
+      try {
+        const domain = new URL(url).hostname;
+        return `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+      } catch {
+        return '';
+      }
+    }
+
+    function render() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      groupsContainer.innerHTML = '';
+
+      const filteredGroups = groups
+        .map(group => {
+          const matchedLinks = group.links.filter(link => {
+            if (!keyword) return true;
+            return (
+              group.name.toLowerCase().includes(keyword) ||
+              link.name.toLowerCase().includes(keyword) ||
+              link.url.toLowerCase().includes(keyword)
+            );
+          });
+          return { ...group, links: matchedLinks };
+        })
+        .filter(group => !keyword || group.name.toLowerCase().includes(keyword) || group.links.length > 0);
+
+      if (filteredGroups.length === 0) {
+        groupsContainer.innerHTML = '<div class="group"><div class="empty">没有找到匹配内容，试试别的关键词。</div></div>';
+        return;
+      }
+
+      filteredGroups.forEach(group => {
+        const groupEl = document.createElement('article');
+        groupEl.className = 'group';
+
+        const linksHtml = group.links.length
+          ? `<div class="links-grid">${group.links.map(link => `
+              <a class="link-card" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
+                <div class="favicon">
+                  <img src="${faviconUrl(link.url)}" alt="${escapeHtml(link.name)}" onerror="this.parentElement.innerHTML='${escapeHtml(getInitial(link.name))}'" />
+                </div>
+                <div class="link-info">
+                  <div class="link-name">${escapeHtml(link.name)}</div>
+                  <div class="link-url">${escapeHtml(getDomain(link.url))}</div>
+                </div>
+                <button class="delete-link" onclick="event.preventDefault(); event.stopPropagation(); deleteLink('${group.id}','${link.id}')">✕</button>
+              </a>
+            `).join('')}</div>`
+          : '<div class="empty">这个分组还没有网站，点击“添加网站”开始添加。</div>';
+
+        groupEl.innerHTML = `
+          <div class="group-header">
+            <div class="group-title-wrap">
+              <h2 class="group-title">${escapeHtml(group.name)}</h2>
+              <div class="group-meta">${group.links.length} 个网站</div>
             </div>
-        </div>
-
-        <div class="group-card">
-            <div class="group-title">💻 工作学习</div>
-            <div class="site-list">
-                <a href="https://github.com" class="site-item" target="_blank">
-                    <span class="site-icon">G</span>
-                    <span class="site-name">GitHub</span>
-                </a>
-                <a href="https://gemini.google.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #1a73e8;">✨</span>
-                    <span class="site-name">Gemini AI</span>
-                </a>
-                <a href="https://fanyi.baidu.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #0000ff;">F</span>
-                    <span class="site-name">百度翻译</span>
-                </a>
-                <a href="https://juejin.cn" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #1e80ff;">J</span>
-                    <span class="site-name">稀土掘金</span>
-                </a>
+            <div class="group-tools">
+              <button class="ghost" onclick="openAddLinkModal('${group.id}')">+ 添加网站</button>
+              <button class="ghost" onclick="renameGroup('${group.id}')">重命名</button>
+              <button class="danger" onclick="deleteGroup('${group.id}')">删除分组</button>
             </div>
+          </div>
+          ${linksHtml}
+        `;
+        groupsContainer.appendChild(groupEl);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function openModal(title, contentHtml) {
+      modalTitle.textContent = title;
+      modalBody.innerHTML = contentHtml;
+      modalMask.classList.add('show');
+    }
+
+    function closeModal() {
+      modalMask.classList.remove('show');
+      modalBody.innerHTML = '';
+    }
+
+    function openAddGroupModal() {
+      openModal('添加分组', `
+        <div class="field">
+          <label>分组名称</label>
+          <input id="groupNameInput" type="text" placeholder="例如：开发、娱乐、工作" />
         </div>
-
-        <div class="group-card">
-            <div class="group-title">🛍️ 常用购物</div>
-            <div class="site-list">
-                <a href="https://www.taobao.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #ff5000;">T</span>
-                    <span class="site-name">淘宝</span>
-                </a>
-                <a href="https://www.jd.com" class="site-item" target="_blank">
-                    <span class="site-icon" style="color: #e1251b;">J</span>
-                    <span class="site-name">京东</span>
-                </a>
-            </div>
+        <div class="modal-actions">
+          <button class="ghost" onclick="closeModal()">取消</button>
+          <button class="primary" onclick="submitAddGroup()">保存</button>
         </div>
+      `);
+      setTimeout(() => document.getElementById('groupNameInput')?.focus(), 0);
+    }
 
-    </div>
+    function submitAddGroup() {
+      const input = document.getElementById('groupNameInput');
+      const name = input.value.trim();
+      if (!name) return alert('请输入分组名称');
+      groups.unshift({ id: crypto.randomUUID(), name, links: [] });
+      saveData();
+      render();
+      closeModal();
+    }
 
-    <script>
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script>
+    function openAddLinkModal(groupId) {
+      const options = groups.map(g => `<option value="${g.id}" ${g.id === groupId ? 'selected' : ''}>${escapeHtml(g.name)}</option>`).join('');
+      openModal('添加网站', `
+        <div class="field">
+          <label>所属分组</label>
+          <select id="linkGroupSelect">${options}</select>
+        </div>
+        <div class="field">
+          <label>网站名称</label>
+          <input id="linkNameInput" type="text" placeholder="例如：GitHub" />
+        </div>
+        <div class="field">
+          <label>网站地址</label>
+          <input id="linkUrlInput" type="text" placeholder="例如：https://github.com" />
+        </div>
+        <div class="modal-actions">
+          <button class="ghost" onclick="closeModal()">取消</button>
+          <button class="primary" onclick="submitAddLink()">保存</button>
+        </div>
+      `);
+      setTimeout(() => document.getElementById('linkNameInput')?.focus(), 0);
+    }
+
+    function submitAddLink() {
+      const groupId = document.getElementById('linkGroupSelect').value;
+      const name = document.getElementById('linkNameInput').value.trim();
+      const url = normalizeUrl(document.getElementById('linkUrlInput').value.trim());
+      if (!name || !url) return alert('请填写完整的网站名称和地址');
+
+      let isValid = true;
+      try { new URL(url); } catch { isValid = false; }
+      if (!isValid) return alert('请输入正确的网址');
+
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return;
+
+      group.links.unshift({ id: crypto.randomUUID(), name, url });
+      saveData();
+      render();
+      closeModal();
+    }
+
+    function renameGroup(groupId) {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return;
+      openModal('重命名分组', `
+        <div class="field">
+          <label>新的分组名称</label>
+          <input id="renameGroupInput" type="text" value="${escapeHtml(group.name)}" />
+        </div>
+        <div class="modal-actions">
+          <button class="ghost" onclick="closeModal()">取消</button>
+          <button class="primary" onclick="submitRenameGroup('${group.id}')">保存</button>
+        </div>
+      `);
+      setTimeout(() => document.getElementById('renameGroupInput')?.focus(), 0);
+    }
+
+    function submitRenameGroup(groupId) {
+      const input = document.getElementById('renameGroupInput');
+      const name = input.value.trim();
+      if (!name) return alert('分组名称不能为空');
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return;
+      group.name = name;
+      saveData();
+      render();
+      closeModal();
+    }
+
+    function deleteGroup(groupId) {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return;
+      if (!confirm(`确定删除分组“${group.name}”吗？`)) return;
+      groups = groups.filter(g => g.id !== groupId);
+      saveData();
+      render();
+    }
+
+    function deleteLink(groupId, linkId) {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return;
+      group.links = group.links.filter(link => link.id !== linkId);
+      saveData();
+      render();
+    }
+
+    function resetData() {
+      if (!confirm('确定恢复默认导航内容吗？你当前自定义的数据会被覆盖。')) return;
+      groups = structuredClone(defaultData);
+      saveData();
+      render();
+    }
+
+    window.openAddLinkModal = openAddLinkModal;
+    window.renameGroup = renameGroup;
+    window.submitRenameGroup = submitRenameGroup;
+    window.deleteGroup = deleteGroup;
+    window.deleteLink = deleteLink;
+    window.submitAddGroup = submitAddGroup;
+    window.submitAddLink = submitAddLink;
+    window.closeModal = closeModal;
+
+    render();
+  </script>
 </body>
 </html>
